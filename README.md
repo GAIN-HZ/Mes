@@ -1,16 +1,23 @@
-MES 后端系统前端对接 README 文档
-一、引言
+# MES 后端系统前端对接 README 文档
+
+
+## 一、引言
 本文档用于指导前端开发者快速对接 MES 后端系统，明确对接所需的环境配置、接口使用规则及常见问题解决方案。
+
 后端系统基于 Spring Boot 2.7.18 + MyBatis-Plus 3.5.3.1 开发，已实现设备管理、部门管理等核心功能，数据库连接稳定，接口可直接调用，助力前端快速开发联动。
-二、后端部署前置配置（前端无需操作，供后端移植参考）
-（一）Maven 本地配置
-1.打开项目根目录下的 pom.xml，确保 Maven 仓库配置为本地路径（避免依赖拉取失败）。
-2.若需修改 Maven 配置，可在 IDEA 中进入 File → Settings → Build, Execution, Deployment → Build Tools → Maven，选择本地 Maven 安装路径及配置文件。
-（二）JDK 与语言等级配置
-1.JDK 版本：项目需使用 JDK 1.8（推荐 Dragonwell-ex 1.8.0_452）。
-◦在 IDEA 中进入 File → Project Structure → Project，将 Project SDK 选择为 JDK 1.8。
-◦进入 Modules → Sources，将 Language Level 设置为 8 - Lambdas, type annotations etc.。
-（三）数据库配置修改
+
+
+## 二、后端部署前置配置（前端无需操作，供后端移植参考）
+### （一）Maven 本地配置
+1. 打开项目根目录下的 pom.xml，确保 Maven 仓库配置为本地路径（避免依赖拉取失败）。
+2. 若需修改 Maven 配置，可在 IDEA 中进入 File → Settings → Build, Execution, Deployment → Build Tools → Maven，选择本地 Maven 安装路径及配置文件。
+
+### （二）JDK 与语言等级配置
+1. JDK 版本：项目需使用 JDK 1.8（推荐 Dragonwell-ex 1.8.0_452）。
+   ◦在 IDEA 中进入 File → Project Structure → Project，将 Project SDK 选择为 JDK 1.8。
+   ◦进入 Modules → Sources，将 Language Level 设置为 8 - Lambdas, type annotations etc.。
+
+### （三）数据库配置修改
 打开 src/main/resources/application.yml，修改数据库账号和密码以匹配本地环境：
 
 spring:
@@ -19,20 +26,26 @@ spring:
     username: 你的数据库用户名 # 例如 root
     password: 你的数据库密码     # 例如 0411
     driver-class-name: com.mysql.cj.jdbc.Driver
-三、前端对接准备工作
-（一）环境要求
-1.后端运行环境：Java 1.8（需确保后端服务已按上述配置启动）。
-2.前端开发环境：Node.js 14+（适配主流前端框架如 Vue、React），浏览器建议使用 Chrome 90+ 或 Firefox 88+。
-3.网络要求：前后端需处于同一网络环境，确保前端能访问后端服务器（默认本地地址 localhost:8080）。
-（二）工具准备
-1.接口测试工具：Postman、Apifox 等，用于提前验证接口可用性。
-2.开发工具：VS Code（推荐安装 REST Client 插件快速测试接口）、WebStorm 等前端编辑器。
-3.辅助工具：数据库客户端（如 Navicat），用于核对接口返回数据与数据库存储一致性。
-四、对接配置步骤
-（一）后端服务确认
-1.启动后端服务：运行 com.gxt.mesbackend.MesBackendApplication 启动类，控制台输出 Tomcat started on port(s): 8080 (http) with context path '/mes' 即为启动成功。
-2.验证服务可用性：请勿直接访问 http://localhost:8080/mes（此路径无资源页，会 404），需访问具体接口（如 http://localhost:8080/mes/basic/equip/list），返回 JSON 格式数据则说明服务正常。
-（二）跨域配置（关键）
+
+
+## 三、前端对接准备工作
+### （一）环境要求
+1. 后端运行环境：Java 1.8（需确保后端服务已按上述配置启动）。
+2. 前端开发环境：Node.js 14+（适配主流前端框架如 Vue、React），浏览器建议使用 Chrome 90+ 或 Firefox 88+。
+3. 网络要求：前后端需处于同一网络环境，确保前端能访问后端服务器（默认本地地址 localhost:8080）。
+
+### （二）工具准备
+1. 接口测试工具：Postman、Apifox 等，用于提前验证接口可用性。
+2. 开发工具：VS Code（推荐安装 REST Client 插件快速测试接口）、WebStorm 等前端编辑器。
+3. 辅助工具：数据库客户端（如 Navicat），用于核对接口返回数据与数据库存储一致性。
+
+
+## 四、对接配置步骤
+### （一）后端服务确认
+1. 启动后端服务：运行 com.gxt.mesbackend.MesBackendApplication 启动类，控制台输出 Tomcat started on port(s): 8080 (http) with context path '/mes' 即为启动成功。
+2. 验证服务可用性：请勿直接访问 http://localhost:8080/mes（此路径无资源页，会 404），需访问具体接口（如 http://localhost:8080/mes/basic/equip/list），返回 JSON 格式数据则说明服务正常。
+
+### （二）跨域配置（关键）
 若前端项目与后端不在同一端口 / 域名，后端已内置跨域配置（若需调整可参考以下代码）：
 
 package com.gxt.mesbackend.config;
@@ -50,12 +63,15 @@ public class CorsConfig implements WebMvcConfigurer {
                 .maxAge(3600); // 预检请求缓存时间
     }
 }
-（三）接口基础配置
-1.接口根路径：http://localhost:8080/mes（所有接口均基于此路径拼接，根路径无资源页，需访问具体接口路径）。
-2.数据格式：请求 / 响应均为 JSON，POST/PUT 请求需设置请求头 Content-Type: application/json。
-3.状态码规则：200 = 请求成功，400 = 参数错误，404 = 接口不存在，500 = 服务器异常。
-五、接口使用方法
-（一）已实现核心接口（直接调用）
+
+### （三）接口基础配置
+1. 接口根路径：http://localhost:8080/mes（所有接口均基于此路径拼接，根路径无资源页，需访问具体接口路径）。
+2. 数据格式：请求 / 响应均为 JSON，POST/PUT 请求需设置请求头 Content-Type: application/json。
+3. 状态码规则：200 = 请求成功，400 = 参数错误，404 = 接口不存在，500 = 服务器异常。
+
+
+## 五、接口使用方法
+### （一）已实现核心接口（直接调用）
 1. 设备列表查询
 •接口地址：/basic/equip/list
 •请求方式：GET
@@ -76,6 +92,7 @@ public class CorsConfig implements WebMvcConfigurer {
   ],
   "total": 1
 }
+
 2. 部门相关接口
 
 接口功能	接口地址	请求方式	请求参数	响应说明
@@ -84,9 +101,10 @@ public class CorsConfig implements WebMvcConfigurer {
 查询单个部门	/api/department/{id}	GET	路径参数 id（部门主键）	返回单个部门完整信息
 修改部门	/api/department/{id}	PUT	路径参数 id + body（需修改的字段）	返回修改成功提示及更新信息
 删除部门	/api/department/{id}	DELETE	路径参数 id（部门主键）	返回删除成功提示
-（二）前端请求示例（Axios）
-1.安装 Axios：npm install axios --save
-2.基础请求配置：
+
+### （二）前端请求示例（Axios）
+1. 安装 Axios：npm install axios --save
+2. 基础请求配置：
 
 import axios from 'axios';
 // 创建 axios 实例
@@ -205,28 +223,40 @@ export function deleteDepartment(id) {
   });
 }
 export default service;
-（三）数据处理说明
-1.接口返回数据结构统一包含 code（状态码）、msg（提示信息）、data（业务数据），前端可根据 code 判断请求结果。
-2.字段映射：后端返回字段与数据库表字段一致（如部门表 deptCode 对应部门编码、isValid 表示是否有效（1 = 有效，0 = 无效））。
-3.空数据处理：若接口返回 data 为 empty array，说明数据库对应表无数据，前端可展示 “暂无数据” 提示。
-六、常见问题及解决方法
-（一）接口访问 404
+
+### （三）数据处理说明
+1. 接口返回数据结构统一包含 code（状态码）、msg（提示信息）、data（业务数据），前端可根据 code 判断请求结果。
+2. 字段映射：后端返回字段与数据库表字段一致（如部门表 deptCode 对应部门编码、isValid 表示是否有效（1 = 有效，0 = 无效））。
+3. 空数据处理：若接口返回 data 为 empty array，说明数据库对应表无数据，前端可展示 “暂无数据” 提示。
+
+
+## 六、常见问题及解决方法
+### （一）接口访问 404
 •原因：接口路径错误、后端服务未启动，或直接访问根路径http://localhost:8080/mes（此路径无资源页）。
 •解决：核对接口路径是否拼接根路径 /mes 且为具体接口路径；确认后端服务已启动，且控制台无报错。
-（二）跨域请求报错（CORS）
+
+### （二）跨域请求报错（CORS）
 •原因：后端未配置跨域或配置有误。
 •解决：检查后端是否添加 CorsConfig 配置类；前端请求确保未遗漏 Content-Type 头。
-（三）接口返回 500 错误
+
+### （三）接口返回 500 错误
 •原因：后端服务异常（如数据库连接失败、参数格式错误）。
 •解决：查看后端控制台日志，根据报错信息排查（如数据库账号密码错误、请求参数缺失必填项）。
-（四）接口返回数据为空
+
+### （四）接口返回数据为空
 •原因：数据库对应表无数据或查询条件不匹配。
 •解决：通过 Navicat 查看 t_equip（设备表）、t_department（部门表）是否有数据；核对请求参数是否正确。
-七、注意事项
-1.接口路径区分大小写，需严格按照文档中的路径拼写（如 /basic/equip/list 不可写为 /basic/Equip/List）。
-2.POST/PUT 请求的必填参数需确保传递，否则会返回 400 参数错误。
-3.开发环境建议开启后端 SQL 日志（参考文档前文配置），便于排查数据查询问题。
-4.若需扩展接口或修改字段，可联系后端开发者协调调整。
-八、联系方式
+
+
+## 七、注意事项
+1. 接口路径区分大小写，需严格按照文档中的路径拼写（如 /basic/equip/list 不可写为 /basic/Equip/List）。
+2. POST/PUT 请求的必填参数需确保传递，否则会返回 400 参数错误。
+3. 开发环境建议开启后端 SQL 日志（参考文档前文配置），便于排查数据查询问题。
+4. 若需扩展接口或修改字段，可联系后端开发者协调调整。
+
+
+## 八、联系方式
 若对接过程中遇到问题，可联系后端开发者核对配置或排查接口问题，高效推进开发进度。
+
+
 （注：文档部分内容可能由 AI 生成）
